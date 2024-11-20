@@ -120,23 +120,14 @@ class HBNBCommand(cmd.Cmd):
         """ Default method for unknown commands """
         if '.' in line:
             class_name, method_call = line.split('.', 1)
-            if class_name in self.classes:
-                if method_call == "all()":
-                    self.do_all(class_name)
-                elif method_call == "count()":
-                    self.do_count(class_name)
-                else:
-                    print("** invalid command **")
+            if class_name in self.classes and method_call == "all()":
+                self.do_all(class_name)
             else:
-                print("** class doesn't exist **")
+                print("** invalid command **")
         else:
             print("** invalid command **")
-
-    def do_count(self, class_name):
-        """ Count instances of a class """
-        count = sum(1 for key in storage.all() if key.startswith(class_name + '.'))
-        print(count)
 
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
+
