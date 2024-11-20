@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """ Holberton AirBnB Console """
 import cmd
-import json
 from models import storage
 from models.base_model import BaseModel
 from models.user import User
@@ -83,15 +82,15 @@ class HBNBCommand(cmd.Cmd):
             print('** no instance found **')
 
     def do_update(self, arg):
-        """ Update an instance with attributes """
-        args = arg.split(' ', 2)
-        if len(args) < 1:
-            print('** class name missing **')
+        """ Update an instance with a new attribute """
+        args = arg.split()
+        if not args:
+            print("** class name missing **")
             return
         if args[0] not in self.classes:
             print("** class doesn't exist **")
             return
-        if len(args) < 2:
+        if len(args) == 1:
             print('** instance id missing **')
             return
         key = f"{args[0]}.{args[1]}"
@@ -101,52 +100,55 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 2:
             print('** attribute name missing **')
             return
+        if len(args) == 3:
+            print('** value missing **')
+            return
 
         obj = storage.all()[key]
+        attr_name = args[2]
+        attr_value = args[3].strip("\"'")
         try:
-            data = json.loads(args[2].replace("'", "\""))
-            if isinstance(data, dict):
-                for attr_name, attr_value in data.items():
-                    setattr(obj, attr_name, attr_value)
-                obj.save()
-            else:
-                print("** invalid dictionary **")
-        except json.JSONDecodeError:
-            parts = args[2].split()
-            if len(parts) == 2:
-                attr_name = parts[0]
-                attr_value = parts[1].strip("\"'")
-                try:
-                    attr_value = eval(attr_value)
-                except (SyntaxError, NameError):
-                    pass
-                setattr(obj, attr_name, attr_value)
-                obj.save()
-            else:
-                print('** invalid update format **')
+            attr_value = eval(attr_value)
+        except (SyntaxError, NameError):
+            pass
+        setattr(obj, attr_name, attr_value)
+        obj.save()
 
     def default(self, line):
         """ Default method for unknown commands """
         if '.' in line:
             class_name, method_call = line.split('.', 1)
             if class_name in self.classes:
-                if method_call.startswith("update(") and method_call.endswith(")"):
-                    params = method_call[7:-1].split(", ", 1)
-                    instance_id = params[0].strip("\"'")
-                    if len(params) > 1 and params[1].startswith("{"):
-                        dictionary = params[1]
-                        self.do_update(f"{class_name} {instance_id} {dictionary}")
-                    elif len(params) > 1:
-                        attr_name, attr_value = params[1].split(", ")
+                if method_call.startswith("show(") and method_call.endswith(")"):
+                    instance_id = method_call[5:-1].strip("\"'")
+                    self.do_show(f"{class_name} {instance_id}")
+                elif method_call.startswith("destroy(") and method_call.endswith(")"):
+                    instance_id = method_call[8:-1].strip("\"'")
+                    self.do_destroy(f"{class_name} {instance_id}")
+                elif method_call.startswith("update(") and method_call.endswith(")"):
+                    params = method_call[7:-1].split(", ")
+                    if len(params) == 3:
+                        instance_id = params[0].strip("\"'")
+                        attr_name = params[1].strip("\"'")
+                        attr_value = params[2]
                         self.do_update(f"{class_name} {instance_id} {attr_name} {attr_value}")
                     else:
                         print("** invalid command **")
+                elif method_call == "all()":
+                    self.do_all(class_name)
+                elif method_call == "count()":
+                    self.do_count(class_name)
                 else:
                     print("** invalid command **")
             else:
                 print("** class doesn't exist **")
         else:
             print("** invalid command **")
+
+    def do_count(self, class_name):
+        """ Count instances of a class """
+        count = sum(1 for key in storage.all() if key.startswith(class_name + '.'))
+        print(count)
 
 
 if __name__ == '__main__':
