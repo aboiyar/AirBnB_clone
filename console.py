@@ -125,11 +125,37 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print('** invalid update format **')
 
-    def default(self, line):
-        """ Default method for unknown commands """
+        def default(self, line):
+        """ Default method for handling '<class name>.<method>' syntax """
         if '.' in line:
             class_name, method_call = line.split('.', 1)
             if class_name in self.classes:
+                # Handling <class name>.show(<id>)
+                if method_call.startswith("show(") and method_call.endswith(")"):
+                    instance_id = method_call[5:-1].strip("\"'")
+                    key = f"{class_name}.{instance_id}"
+                    if key in storage.all():
+                        print(storage.all()[key])
+                    else:
+                        print("** no instance found **")
+                    return
+                # Handling <class name>.count()
+                if method_call == "count()":
+                    count = sum(1 for key in storage.all() if key.startswith(f"{class_name}."))
+                    print(count)
+                    return
+                # Handling <class name>.destroy(<id>)
+                if method_call.startswith("destroy(") and method_call.endswith(")"):
+                    instance_id = method_call[8:-1].strip("\"'")
+                    key = f"{class_name}.{instance_id}"
+                    if key in storage.all():
+                        del storage.all()[key]
+                        storage.save()
+                        print("** instance destroyed **")
+                    else:
+                        print("** no instance found **")
+                    return
+                # Handling <class name>.update() and other methods
                 if method_call.startswith("update(") and method_call.endswith(")"):
                     params = method_call[7:-1].split(", ", 1)
                     instance_id = params[0].strip("\"'")
@@ -141,10 +167,8 @@ class HBNBCommand(cmd.Cmd):
                         self.do_update(f"{class_name} {instance_id} {attr_name} {attr_value}")
                     else:
                         print("** invalid command **")
-                else:
-                    print("** invalid command **")
-            else:
-                print("** class doesn't exist **")
+                    return
+            print("** class doesn't exist **")
         else:
             print("** invalid command **")
 
