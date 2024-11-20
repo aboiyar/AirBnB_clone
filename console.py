@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Holberton AirBnB Console """
 import cmd
+import json
 from models import storage
 from models.base_model import BaseModel
 from models.user import User
@@ -81,49 +82,69 @@ class HBNBCommand(cmd.Cmd):
         else:
             print('** no instance found **')
 
-    def do_all(self, arg):
-        """ Method to print all instances """
-        if not arg:
-            print([str(obj) for obj in storage.all().values()])
-        elif arg in self.classes:
-            print([str(obj) for key, obj in storage.all().items() if key.startswith(arg)])
-        else:
-            print("** class doesn't exist **")
-
     def do_update(self, arg):
-        """ Method to update JSON file"""
-        args = arg.split()
-        if not args:
+        """ Update an instance with attributes """
+        args = arg.split(' ', 2)
+        if len(args) < 1:
             print('** class name missing **')
             return
         if args[0] not in self.classes:
             print("** class doesn't exist **")
             return
-        if len(args) == 1:
+        if len(args) < 2:
             print('** instance id missing **')
             return
         key = f"{args[0]}.{args[1]}"
-        obj = storage.all().get(key)
-        if not obj:
+        if key not in storage.all():
             print('** no instance found **')
             return
         if len(args) == 2:
             print('** attribute name missing **')
             return
-        if len(args) == 3:
-            print('** value missing **')
-            return
-        setattr(obj, args[2], eval(args[3]))
-        obj.save()
+
+        obj = storage.all()[key]
+        try:
+            data = json.loads(args[2].replace("'", "\""))
+            if isinstance(data, dict):
+                for attr_name, attr_value in data.items():
+                    setattr(obj, attr_name, attr_value)
+                obj.save()
+            else:
+                print("** invalid dictionary **")
+        except json.JSONDecodeError:
+            parts = args[2].split()
+            if len(parts) == 2:
+                attr_name = parts[0]
+                attr_value = parts[1].strip("\"'")
+                try:
+                    attr_value = eval(attr_value)
+                except (SyntaxError, NameError):
+                    pass
+                setattr(obj, attr_name, attr_value)
+                obj.save()
+            else:
+                print('** invalid update format **')
 
     def default(self, line):
         """ Default method for unknown commands """
         if '.' in line:
             class_name, method_call = line.split('.', 1)
-            if class_name in self.classes and method_call == "all()":
-                self.do_all(class_name)
+            if class_name in self.classes:
+                if method_call.startswith("update(") and method_call.endswith(")"):
+                    params = method_call[7:-1].split(", ", 1)
+                    instance_id = params[0].strip("\"'")
+                    if len(params) > 1 and params[1].startswith("{"):
+                        dictionary = params[1]
+                        self.do_update(f"{class_name} {instance_id} {dictionary}")
+                    elif len(params) > 1:
+                        attr_name, attr_value = params[1].split(", ")
+                        self.do_update(f"{class_name} {instance_id} {attr_name} {attr_value}")
+                    else:
+                        print("** invalid command **")
+                else:
+                    print("** invalid command **")
             else:
-                print("** invalid command **")
+                print("** class doesn't exist **")
         else:
             print("** invalid command **")
 
