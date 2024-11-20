@@ -121,10 +121,7 @@ class HBNBCommand(cmd.Cmd):
         if '.' in line:
             class_name, method_call = line.split('.', 1)
             if class_name in self.classes:
-                if method_call.startswith("show(") and method_call.endswith(")"):
-                    instance_id = method_call[5:-1].strip("\"'")
-                    self.do_show(f"{class_name} {instance_id}")
-                elif method_call == "all()":
+                if method_call == "all()":
                     self.do_all(class_name)
                 elif method_call == "count()":
                     self.do_count(class_name)
