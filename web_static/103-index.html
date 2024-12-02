@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AirBnB Clone</title>
+  <link rel="stylesheet" href="styles/103-common.css">
+  <link rel="stylesheet" href="styles/103-header.css">
+  <link rel="stylesheet" href="styles/103-footer.css">
+  <link rel="stylesheet" href="styles/103-filters.css">
+  <link rel="stylesheet" href="styles/103-places.css">
+</head>
+<body>
+  <header>
+    <div class="logo" role="banner" aria-label="Website logo"></div>
+    <div class="search-bar" role="search">
+      <label for="search-input" class="sr-only">Search for places</label>
+      <input id="search-input" type="text" placeholder="Search for places" aria-label="Search places">
+      <button type="button" aria-label="Search button">Search</button>
+    </div>
+  </header>
+  <div class="container">
+    <section class="filters" aria-labelledby="filters-title">
+      <h2 id="filters-title">Filters</h2>
+      <div class="locations">
+        <h3>Locations</h3>
+        <ul class="popover" aria-labelledby="locations-list">
+          <li>Location 1</li>
+          <li>Location 2</li>
+        </ul>
+      </div>
+      <div class="amenities">
+        <h3>Amenities</h3>
+        <ul class="popover" aria-labelledby="amenities-list">
+          <li>Wi-Fi</li>
+          <li>Pool</li>
+        </ul>
+      </div>
+    </section>
+    <section class="places" aria-labelledby="places-title">
+      <h1 id="places-title">Places</h1>
+      <div class="places-container">
+        <article>
+          <header>
+            <div class="title">
+              <h2>Beach Resort</h2>
+              <div class="price_by_night" aria-label="Price per night">$200</div>
+            </div>
+            <div class="information">
+              <div class="max_guest" aria-label="Number of guests">👥 4 Guests</div>
+              <div class="number_rooms" aria-label="Number of bedrooms">🛏️ 2 Bedrooms</div>
+              <div class="number_bathrooms" aria-label="Number of bathrooms">🛁 1 Bathroom</div>
+            </div>
+            <div class="user">
+              Owner: <strong>John Doe</strong>
+            </div>
+            <div class="description">
+              A cozy beach resort with stunning ocean views and modern amenities.
+            </div>
+          </header>
+        </article>
+        <article>
+          <header>
+            <div class="title">
+              <h2>Mountain Cabin</h2>
+              <div class="price_by_night" aria-label="Price per night">$150</div>
+            </div>
+            <div class="information">
+              <div class="max_guest" aria-label="Number of guests">👥 6 Guests</div>
+              <div class="number_rooms" aria-label="Number of bedrooms">🛏️ 3 Bedrooms</div>
+              <div class="number_bathrooms" aria-label="Number of bathrooms">🛁 2 Bathrooms</div>
+            </div>
+            <div class="user">
+              Owner: <strong>Jane Smith</strong>
+            </div>
+            <div class="description">
+              A serene mountain cabin surrounded by beautiful trails and forests.
+            </div>
+          </header>
+        </article>
+      </div>
+    </section>
+  </div>
+  <footer>
+    <p>&copy; 2024 Best School</p>
+    <button type="button" onclick="window.open('https://twitter.com/share', '_blank')">Click here to tweet!</button>
+  </footer>
+</body>
+</html>

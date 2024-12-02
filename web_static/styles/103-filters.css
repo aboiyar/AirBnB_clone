@@ -1,0 +1,32 @@
+.filters {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filters .locations,
+.filters .amenities {
+  flex: 1 1 calc(50% - 10px);
+}
+
+.filters h3 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+ul.popover {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.popover li {
+  padding: 5px 0;
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
+}
+
